@@ -9,6 +9,22 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi', 'arm64-v8a' /*, 'x86'*///, 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
     }
     buildTypes {
         release {
@@ -25,4 +41,22 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+
+    //    如果你的jar包/依赖代码 在编译的时候需要依赖，在运行的时候也需要，那么就用compile
+    //    如果你的jar包/依赖代码 仅在编译的时候需要，但是在运行时不需要依赖,就用provided
+    if(findProject(":Downloader")) {
+        api files('libs/xutil3.3.6.jar')
+        api project(':Downloader')
+        api project(':OAuth2_Android_SDK:XmPayOrderSDK')
+        api project(':TingPhoneOpenSDK')
+        api project(':OpenSDKAdModel')
+    } else{
+        api fileTree(dir: 'libs', include: '*.jar')
+    }
+
+    api 'com.google.code.gson:gson:2.8.1'
+    api 'com.squareup.okhttp3:okhttp:3.11.0'
+    api 'com.squareup.okio:okio:1.15.0'
+    api 'com.android.support:support-v4:28.0.0'
 }
