@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="75dp">
+
+    <ImageView
+        android:id="@+id/album_imv"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="9dp"
+        android:contentDescription="TODO"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/album_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/album_imv"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/album_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="16dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/album_imv"
+        app:layout_constraintTop_toBottomOf="@+id/album_title" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="10dp"
+        android:layout_height="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="TODO"
+        android:src="@mipmap/play_count_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/album_play_count"
+        app:layout_constraintStart_toEndOf="@+id/album_imv"
+        app:layout_constraintTop_toBottomOf="@+id/album_description" />
+
+    <TextView
+        android:id="@+id/album_play_count"
+        android:layout_width="44dp"
+        android:layout_height="10dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="10dp"
+        android:singleLine="true"
+        android:text="TextView"
+        android:textSize="7sp"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintTop_toBottomOf="@+id/album_description" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toEndOf="@+id/album_play_count"
+        app:layout_constraintTop_toBottomOf="@+id/album_description"
+        android:src="@mipmap/ic_sound"
+        android:contentDescription="TODO" />
+
+    <TextView
+        android:id="@+id/album_ji_count"
+        android:layout_width="44dp"
+        android:layout_height="10dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="10dp"
+        android:text="TextView"
+        android:textSize="7sp"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/album_description" />
+</android.support.constraint.ConstraintLayout>
