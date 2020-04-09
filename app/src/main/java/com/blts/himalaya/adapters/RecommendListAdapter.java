@@ -2,6 +2,7 @@ package com.blts.himalaya.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,10 @@ import java.util.List;
  *
  */
 public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdapter.InnerHolder> {
+    private static final String TAG = "RecommendListAdapter";
     private List<Album> mData = new ArrayList<>();
+    private OnAlbumItemClickListener mItemClickListener = null;
+    private OnAlbumItemLongClickListener mLongClickListener = null;
 
     @NonNull
     @Override
@@ -36,6 +40,16 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
     public void onBindViewHolder(@NonNull InnerHolder innerHolder, int position) {
         //设置数据
         innerHolder.itemView.setTag(position);
+        innerHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mItemClickListener != null) {
+                    int clickPosition = (int) v.getTag();
+                    mItemClickListener.onItemClick(clickPosition, mData.get(clickPosition));
+                }
+               // LogUtil.d(TAG, "holder.itemView click -- > " + v.getTag());
+            }
+        });
         innerHolder.setData(mData.get(position));
     }
 
@@ -86,5 +100,25 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
 
             Picasso.get().load(album.getCoverUrlLarge()).into(albumCover);
         }
+    }
+
+    public void setAlbumItemClickListener(OnAlbumItemClickListener listener) {
+        this.mItemClickListener = listener;
+    }
+
+    public interface OnAlbumItemClickListener {
+        void onItemClick(int position, Album album);
+    }
+
+
+    public void setOnAlbumItemLongClickListener(OnAlbumItemLongClickListener listener) {
+        this.mLongClickListener = listener;
+    }
+
+    /**
+     * item长按的接口
+     */
+    public interface OnAlbumItemLongClickListener {
+        void onItemLongClick(Album album);
     }
 }

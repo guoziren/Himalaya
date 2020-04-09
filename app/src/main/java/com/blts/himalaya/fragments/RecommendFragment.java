@@ -1,5 +1,6 @@
 package com.blts.himalaya.fragments;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,10 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.blts.himalaya.DetailActivity;
 import com.blts.himalaya.R;
 import com.blts.himalaya.adapters.RecommendListAdapter;
 import com.blts.himalaya.base.BaseFragment;
 import com.blts.himalaya.interfaces.IRecommendViewCallBack;
+import com.blts.himalaya.presenters.AlbumDetailPresenter;
 import com.blts.himalaya.presenters.RecommendPresenter;
 import com.blts.himalaya.utils.Constants;
 import com.blts.himalaya.utils.LogUtil;
@@ -35,7 +38,7 @@ import java.util.Map;
  * 创建时间：      2020/4/8 10:09 AM
  *
  */
-public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener {
+public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener, RecommendListAdapter.OnAlbumItemClickListener {
     private static final String TAG = "RecommendFragment";
     private View mRootView;
     private RecommendListAdapter mRecommendListAdapter;
@@ -94,6 +97,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //3.设置适配器
         mRecommendListAdapter = new RecommendListAdapter();
         mRecommendView.setAdapter(mRecommendListAdapter);
+        mRecommendListAdapter.setAlbumItemClickListener(this);
         return mRootView;
     }
 
@@ -138,5 +142,14 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         if(mRecommendPresenter != null){
             mRecommendPresenter.getRecommendList();
         }
+    }
+
+    @Override
+    public void onItemClick(int position, Album album) {
+        AlbumDetailPresenter.getInstance().setTargetAlbum(album);
+        //recyclerview的item被点击,跳转到另一个界面
+        Intent intent = new Intent(getContext(), DetailActivity.class);
+        startActivity(intent);
+
     }
 }

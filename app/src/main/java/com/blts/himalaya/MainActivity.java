@@ -8,13 +8,14 @@ import android.util.Log;
 
 import com.blts.himalaya.adapters.IndicatorAdapter;
 import com.blts.himalaya.adapters.MainContentAdapter;
+import com.blts.himalaya.base.BaseActivity;
 import com.blts.himalaya.utils.LogUtil;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.CommonNavigator;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
     private MagicIndicator mMagicIndicator;
     private ViewPager mViewPager;
