@@ -3,8 +3,10 @@ package com.blts.himalaya.presenters;
 import android.support.annotation.Nullable;
 
 
+import com.blts.himalaya.data.XimalayApi;
 import com.blts.himalaya.interfaces.IAlbumDetailPresenter;
 import com.blts.himalaya.interfaces.IAlbumDetailViewCallback;
+import com.blts.himalaya.utils.LogUtil;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
@@ -60,38 +62,38 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
 //        doLoaded(true);
     }
 
-//    private void doLoaded(final boolean isLoaderMore) {
-//        XimalayApi ximalayApi = XimalayApi.getXimalayApi();
-//        ximalayApi.getAlbumDetail(new IDataCallBack<TrackList>() {
-//            @Override
-//            public void onSuccess(@Nullable TrackList trackList) {
-//                if (trackList != null) {
-//                    List<Track> tracks = trackList.getTracks();
-//                    LogUtil.d(TAG, "tracks size -- > " + tracks.size());
-//                    if (isLoaderMore) {
-//                        //上拉加载，结果放到后面去
-//                        mTracks.addAll(tracks);
-//                        int size = tracks.size();
-//                        handlerLoaderMoreResult(size);
-//                    } else {
-//                        //这个是下拉加载，结果放到前面去
-//                        mTracks.addAll(0, tracks);
-//                    }
-//                    handlerAlbumDetailResult(mTracks);
-//                }
-//            }
-//
-//            @Override
-//            public void onError(int errorCode, String errorMsg) {
-//                if (isLoaderMore) {
-//                    mCurrentPageIndex--;
-//                }
-//                LogUtil.d(TAG, "errorCode -- >   " + errorCode);
-//                LogUtil.d(TAG, "errorMsg -- >   " + errorMsg);
-//                handlerError(errorCode, errorMsg);
-//            }
-//        }, mCurrentAlbumId, mCurrentPageIndex);
-//    }
+    private void doLoaded(final boolean isLoaderMore) {
+        XimalayApi ximalayApi = XimalayApi.getXimalayApi();
+        ximalayApi.getAlbumDetail(new IDataCallBack<TrackList>() {
+            @Override
+            public void onSuccess(@Nullable TrackList trackList) {
+                if (trackList != null) {
+                    List<Track> tracks = trackList.getTracks();
+                    LogUtil.d(TAG, "tracks size -- > " + tracks.size());
+                    if (isLoaderMore) {
+                        //上拉加载，结果放到后面去
+                        mTracks.addAll(tracks);
+                        int size = tracks.size();
+                        handlerLoaderMoreResult(size);
+                    } else {
+                        //这个是下拉加载，结果放到前面去
+                        mTracks.addAll(0, tracks);
+                    }
+                    handlerAlbumDetailResult(mTracks);
+                }
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                if (isLoaderMore) {
+                    mCurrentPageIndex--;
+                }
+                LogUtil.d(TAG, "errorCode -- >   " + errorCode);
+                LogUtil.d(TAG, "errorMsg -- >   " + errorMsg);
+                handlerError(errorCode, errorMsg);
+            }
+        }, mCurrentAlbumId, mCurrentPageIndex);
+    }
 
     /**
      * 处理加载更多的结果
@@ -110,7 +112,7 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
         this.mCurrentAlbumId = albumId;
         this.mCurrentPageIndex = page;
         //根据页码和专辑id获取列表
-//        doLoaded(false);
+        doLoaded(false);
     }
 
     /**

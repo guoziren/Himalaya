@@ -1,16 +1,22 @@
 package com.blts.himalaya;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.blts.himalaya.adapters.TrackListAdapter;
 import com.blts.himalaya.base.BaseActivity;
+import com.blts.himalaya.base.BaseApplication;
 import com.blts.himalaya.interfaces.IAlbumDetailViewCallback;
 import com.blts.himalaya.presenters.AlbumDetailPresenter;
 import com.blts.himalaya.utils.ImageBlur;
@@ -22,6 +28,8 @@ import com.squareup.picasso.Picasso;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 
+import net.lucode.hackware.magicindicator.buildins.UIUtil;
+
 import java.util.List;
 
 /*
@@ -30,7 +38,7 @@ import java.util.List;
  * 创建时间：      2020/4/9 9:39 AM
  *
  */
-public class DetailActivity extends BaseActivity implements IAlbumDetailViewCallback {
+public class DetailActivity extends BaseActivity implements IAlbumDetailViewCallback, UILoader.OnRetryClickListener, TrackListAdapter.ItemClickListener {
     private static final String TAG = "DetailActivity";
     private ImageView mLargeCover;
     private RoundRectImageView mSmallCover;
@@ -39,7 +47,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
     private AlbumDetailPresenter mAlbumDetailPresenter;
     private int mCurrentPage = 1;
     private RecyclerView mDetailList;
-//    private TrackListAdapter mDetailListAdapter;
+    private TrackListAdapter mDetailListAdapter;
     private FrameLayout mDetailListContainer;
     private UILoader mUiLoader;
     private long mCurrentId = -1;
@@ -68,19 +76,19 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
 //        initListener();
     }
     private void initView() {
-//        mDetailListContainer = this.findViewById(R.id.detail_list_container);
+        mDetailListContainer = this.findViewById(R.id.detail_list_container);
         //
-//        if (mUiLoader == null) {
-//            mUiLoader = new UILoader(this) {
-//                @Override
-//                protected View getSuccessView(ViewGroup container) {
-//                    return createSuccessView(container);
-//                }
-//            };
-//            mDetailListContainer.removeAllViews();
-//            mDetailListContainer.addView(mUiLoader);
-//            mUiLoader.setOnRetryClickListener(DetailActivity.this);
-//        }
+        if (mUiLoader == null) {
+            mUiLoader = new UILoader(this) {
+                @Override
+                protected View getSuccessView(ViewGroup container) {
+                    return createSuccessView(container);
+                }
+            };
+            mDetailListContainer.removeAllViews();
+            mDetailListContainer.addView(mUiLoader);
+            mUiLoader.setOnRetryClickListener(DetailActivity.this);
+        }
 
         mLargeCover = this.findViewById(R.id.iv_large_cover);
         mSmallCover = this.findViewById(R.id.iv_small_cover);
@@ -105,15 +113,84 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
 //        mSubscriptionPresenter.getSubscriptionList();
 //        mSubscriptionPresenter.registerViewCallback(this);
     }
+    private View createSuccessView(ViewGroup container) {
+        View detailListView = LayoutInflater.from(this).inflate(R.layout.item_detail_list, container, false);
+        mDetailList = detailListView.findViewById(R.id.album_detail_list);
+        //mRefreshLayout = detailListView.findViewById(R.id.refresh_layout);
+        //RecyclerView的使用步骤
+        //第一步:设置布局管理器
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mDetailList.setLayoutManager(layoutManager);
+        //第二步:设置适配器
+        mDetailListAdapter = new TrackListAdapter();
+        mDetailList.setAdapter(mDetailListAdapter);
+        //设置item的上下间距
+        mDetailList.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.top = UIUtil.dip2px(view.getContext(), 2);
+                outRect.bottom = UIUtil.dip2px(view.getContext(), 2);
+                outRect.left = UIUtil.dip2px(view.getContext(), 2);
+                outRect.right = UIUtil.dip2px(view.getContext(), 2);
+            }
+        });
 
+        mDetailListAdapter.setItemClickListener(this);
+//        BezierLayout headerView = new BezierLayout(this);
+//        mRefreshLayout.setHeaderView(headerView);
+//        mRefreshLayout.setMaxHeadHeight(140);
+//        mRefreshLayout.setOverScrollBottomShow(false);
+//        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+//            @Override
+//            public void onRefresh(TwinklingRefreshLayout refreshLayout) {
+//                super.onRefresh(refreshLayout);
+//                BaseApplication.getHandler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(DetailActivity.this, "刷新成功...", Toast.LENGTH_SHORT).show();
+//                        mRefreshLayout.finishRefreshing();
+//                    }
+//                }, 2000);
+//            }
+//
+//            @Override
+//            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+//                super.onLoadMore(refreshLayout);
+//                //去加载更多的内容
+//                if (mAlbumDetailPresenter != null) {
+//                    mAlbumDetailPresenter.loadMore();
+//                    mIsLoaderMore = true;
+//                }
+//            }
+//        });
+        return detailListView;
+    }
     @Override
     public void onDetailListLoaded(List<Track> tracks) {
+//        if (mIsLoaderMore && mRefreshLayout != null) {
+//            mRefreshLayout.finishLoadmore();
+//            mIsLoaderMore = false;
+//        }
 
+        this.mCurrentTracks = tracks;
+        //判断数据结果，根据结果控制UI显示
+        if (tracks == null || tracks.size() == 0) {
+            if (mUiLoader != null) {
+                mUiLoader.updateStatus(UILoader.UIStatus.EMPTY);
+            }
+        }
+
+        if (mUiLoader != null) {
+            mUiLoader.updateStatus(UILoader.UIStatus.SUCCESS);
+        }
+        //更新/设置UI数据
+        mDetailListAdapter.setData(tracks);
     }
 
     @Override
     public void onNetworkError(int errorCode, String errorMsg) {
-
+        //请求发生错误，显示网络异常状态
+        mUiLoader.updateStatus(UILoader.UIStatus.NETWORK_ERROR);
     }
 
     @Override
@@ -171,6 +248,18 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
 
     @Override
     public void onRefreshFinished(int size) {
+
+    }
+    @Override
+    public void onRetryClick() {
+        //这里面表示用户网络不佳的时候 去点击了重新加载
+        if (mAlbumDetailPresenter != null) {
+            mAlbumDetailPresenter.getAlbumDetail((int) mCurrentId, mCurrentPage);
+        }
+    }
+
+    @Override
+    public void onItemClick(List<Track> detailData, int position) {
 
     }
 }
