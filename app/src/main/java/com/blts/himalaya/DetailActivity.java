@@ -1,5 +1,6 @@
 package com.blts.himalaya;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -19,6 +20,7 @@ import com.blts.himalaya.base.BaseActivity;
 import com.blts.himalaya.base.BaseApplication;
 import com.blts.himalaya.interfaces.IAlbumDetailViewCallback;
 import com.blts.himalaya.presenters.AlbumDetailPresenter;
+import com.blts.himalaya.presenters.PlayerPresenter;
 import com.blts.himalaya.utils.ImageBlur;
 import com.blts.himalaya.utils.LogUtil;
 import com.blts.himalaya.views.RoundRectImageView;
@@ -260,7 +262,12 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
 
     @Override
     public void onItemClick(List<Track> detailData, int position) {
-
+        //设置播放器的数据
+        PlayerPresenter playerPresenter = PlayerPresenter.getPlayerPresenter();
+        playerPresenter.setPlayList(detailData, position);
+        //跳转到播放器界面
+        Intent intent = new Intent(this, PlayerActivity.class);
+        startActivity(intent);
     }
 }
 
