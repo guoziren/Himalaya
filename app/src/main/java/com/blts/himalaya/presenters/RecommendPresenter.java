@@ -46,6 +46,7 @@ public class RecommendPresenter implements IRecommendPresenter {
      */
     @Override
     public void getRecommendList() {
+        updateLoading();
         Map<String, String> map = new HashMap<String, String>();
         //返回多少条数据
         map.put(DTransferConstants.LIKE_COUNT, Constants.RECOMMEND_COUNT + "");
@@ -65,16 +66,37 @@ public class RecommendPresenter implements IRecommendPresenter {
             public void onError(int i, String s) {
                 LogUtil.d(TAG, "onError: "  + i);
                 LogUtil.d(TAG, "onError: "  + s);
+                handleError();
             }
         });
     }
 
-    private void handleRecommendResult(List<Album> albumList) {
-        //通知ui更新
+    private void handleError() {
         if (mCallBacks != null){
             for (IRecommendViewCallBack callBack : mCallBacks) {
-                callBack.onRecommendListLoaded(albumList);
+                callBack.onNetwordError();
             }
+        }
+    }
+
+    private void handleRecommendResult(List<Album> albumList) {
+        //通知ui更新
+        if (albumList != null){
+            if (albumList.size() == 0){
+                for (IRecommendViewCallBack callBack : mCallBacks) {
+                    callBack.onEmpty();
+                }
+            }else{
+                for (IRecommendViewCallBack callBack : mCallBacks) {
+                    callBack.onRecommendListLoaded(albumList);
+                }
+            }
+        }
+
+    }
+    private void updateLoading(){
+        for (IRecommendViewCallBack callBack : mCallBacks) {
+            callBack.onLoading();
         }
     }
 

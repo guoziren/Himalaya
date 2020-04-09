@@ -16,6 +16,7 @@ import com.blts.himalaya.interfaces.IRecommendViewCallBack;
 import com.blts.himalaya.presenters.RecommendPresenter;
 import com.blts.himalaya.utils.Constants;
 import com.blts.himalaya.utils.LogUtil;
+import com.blts.himalaya.views.UILoader;
 import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
@@ -34,14 +35,44 @@ import java.util.Map;
  * 创建时间：      2020/4/8 10:09 AM
  *
  */
-public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack {
+public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener {
     private static final String TAG = "RecommendFragment";
     private View mRootView;
     private RecommendListAdapter mRecommendListAdapter;
     private RecommendPresenter mRecommendPresenter;
+    private UILoader mUiLoader;
 
     @Override
     protected View onSubViewLoaded(LayoutInflater layoutInflater, ViewGroup container) {
+        mUiLoader = new UILoader(getContext()) {
+            @Override
+            protected View getSuccessView(ViewGroup container) {
+                return createSuccessView(layoutInflater,container);
+            }
+        };
+
+
+
+
+        //获取到逻辑层对象
+        mRecommendPresenter = RecommendPresenter.getInstance();
+        //先要设置通知接口的注册
+        mRecommendPresenter.registerViewCallback(this);
+        //获取推荐列表
+        mRecommendPresenter.getRecommendList();
+
+        //解绑？
+        if (mUiLoader.getParent() instanceof ViewGroup){
+            ((ViewGroup) mUiLoader.getParent()).removeView(mUiLoader);
+        }
+        mUiLoader.setOnRetryClickListener(this);
+
+        //返回，显示界面
+        return mUiLoader;
+    }
+
+    private View createSuccessView(LayoutInflater layoutInflater, ViewGroup container) {
+
         //view 加载完成
         mRootView = layoutInflater.inflate(R.layout.fragment_recommend,container,false);
         //RecyclerView的使用
@@ -63,20 +94,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //3.设置适配器
         mRecommendListAdapter = new RecommendListAdapter();
         mRecommendView.setAdapter(mRecommendListAdapter);
-
-        //获取到逻辑层对象
-        mRecommendPresenter = RecommendPresenter.getInstance();
-        //先要设置通知接口的注册
-        mRecommendPresenter.registerViewCallback(this);
-        //获取推荐列表
-        mRecommendPresenter.getRecommendList();
-
-
-        //返回，显示界面
         return mRootView;
     }
-
-
 
 
     @Override
@@ -85,11 +104,22 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
 
         //把数据设置给适配器,更新ui
         mRecommendListAdapter.setData(result);
+        mUiLoader.updateStatus(UILoader.UIStatus.SUCCESS);
     }
 
     @Override
     public void onNetwordError() {
+        mUiLoader.updateStatus(UILoader.UIStatus.NETWORK_ERROR);
+    }
 
+    @Override
+    public void onEmpty() {
+        mUiLoader.updateStatus(UILoader.UIStatus.EMPTY);
+    }
+
+    @Override
+    public void onLoading() {
+        mUiLoader.updateStatus(UILoader.UIStatus.LOADING);
     }
 
 
@@ -99,6 +129,14 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //取消接口的注册，以免内存泄露
         if (mRecommendPresenter != null){
             mRecommendPresenter.unRegisterViewCallback(this);
+        }
+    }
+
+    @Override
+    public void onRetryClick() {
+        //表示网络不好时，用户点击了重试
+        if(mRecommendPresenter != null){
+            mRecommendPresenter.getRecommendList();
         }
     }
 }

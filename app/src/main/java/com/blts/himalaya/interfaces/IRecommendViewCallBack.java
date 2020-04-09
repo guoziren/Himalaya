@@ -29,5 +29,13 @@ public interface IRecommendViewCallBack {
      */
     void onNetwordError();
 
+    /**
+     * 数据为空
+     */
+    void onEmpty();
 
+    /**
+     * 正在加载
+     */
+    void onLoading();
 }
