@@ -307,37 +307,37 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     //====================广告相关的回调方法 start====================
     @Override
     public void onStartGetAdsInfo() {
-        LogUtil.d(TAG,"onStartGetAdsInfo..");
+//        LogUtil.d(TAG,"onStartGetAdsInfo..");
     }
 
     @Override
     public void onGetAdsInfo(AdvertisList advertisList) {
-        LogUtil.d(TAG,"onGetAdsInfo...");
+//        LogUtil.d(TAG,"onGetAdsInfo...");
     }
 
     @Override
     public void onAdsStartBuffering() {
-        LogUtil.d(TAG,"onAdsStartBuffering...");
+//        LogUtil.d(TAG,"onAdsStartBuffering...");
     }
 
     @Override
     public void onAdsStopBuffering() {
-        LogUtil.d(TAG,"onAdsStopBuffering...");
+//        LogUtil.d(TAG,"onAdsStopBuffering...");
     }
 
     @Override
     public void onStartPlayAds(Advertis advertis, int i) {
-        LogUtil.d(TAG,"onStartPlayAds..");
+//        LogUtil.d(TAG,"onStartPlayAds..");
     }
 
     @Override
     public void onCompletePlayAds() {
-        LogUtil.d(TAG,"onCompletePlayAds...");
+//        LogUtil.d(TAG,"onCompletePlayAds...");
     }
 
     @Override
     public void onError(int what,int extra) {
-        LogUtil.d(TAG,"onError what = > " + what + " extra = > " + extra);
+//        LogUtil.d(TAG,"onError what = > " + what + " extra = > " + extra);
     }
 
     //====================广告相关的回调方法 end====================

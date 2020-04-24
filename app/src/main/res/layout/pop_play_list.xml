@@ -1,6 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_play_list_bg">
+
+
+    <ImageView
+        android:id="@+id/play_list_order_iv"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/selector_play_mode_list_revers"
+        app:layout_constraintBottom_toBottomOf="@+id/play_list_order_tv"
+        app:layout_constraintEnd_toStartOf="@+id/play_list_order_tv"
+        app:layout_constraintTop_toTopOf="@+id/play_list_order_tv" />
+
+    <TextView
+        android:id="@+id/play_list_order_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="顺序"
+        android:textColor="@color/second_color"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/play_list_play_mode_iv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/play_list_play_mode_iv"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="51dp" />
+
+    <ImageView
+        android:id="@+id/play_list_play_mode_iv"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/selector_play_mode_list_revers"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/play_list_play_mode_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="顺序播放"
+        android:textColor="@color/second_color"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/play_list_play_mode_iv"
+        app:layout_constraintStart_toEndOf="@+id/play_list_play_mode_iv"
+        app:layout_constraintTop_toTopOf="@+id/play_list_play_mode_iv" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/play_list_rv"
+        android:layout_width="0dp"
+        android:layout_height="400dp"
+        app:layout_constraintBottom_toTopOf="@+id/play_list_close_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline5" />
+
+    <TextView
+        android:id="@+id/play_list_close_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="关闭"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_list_rv" />
+
+    <android.support.constraint.Group
+        android:id="@+id/play_list_play_mode_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="play_list_play_mode_iv,play_list_play_mode_tv" />
+
+    <android.support.constraint.Group
+        android:id="@+id/play_list_order_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="play_list_order_tv,play_list_order_iv" />
 
 </android.support.constraint.ConstraintLayout>

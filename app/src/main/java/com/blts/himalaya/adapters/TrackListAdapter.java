@@ -14,6 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 推荐列表详情界面RecyclerView的Adapter
+ */
 public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.InnerHolder> {
 
     private static final String TAG = "TrackListAdapter";

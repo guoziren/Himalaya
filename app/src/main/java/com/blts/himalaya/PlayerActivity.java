@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
@@ -92,31 +94,39 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         mPlayerPresenter = PlayerPresenter.getPlayerPresenter();
         mPlayerPresenter.registerViewCallback(this);
         initEvent();
+        initBgAnimation();
     }
-    /**
-     * 找到各个控件
-     */
-    private void initView() {
-        mControlBtn = this.findViewById(R.id.play_or_pause_btn);
-        mTotalDuration = this.findViewById(R.id.track_duration);
-        mCurrentPosition = this.findViewById(R.id.current_position);
-        mDurationBar = this.findViewById(R.id.track_seek_bar);
-        mPlayNextBtn = this.findViewById(R.id.play_next);
-        mPlayPreBtn = this.findViewById(R.id.play_pre);
-        mTrackTitleTv = this.findViewById(R.id.track_title);
-        if (!TextUtils.isEmpty(mTrackTitleText)) {
-            mTrackTitleTv.setText(mTrackTitleText);
+
+    private void initBgAnimation() {
+        mEnterBgAnimator = ValueAnimator.ofFloat(1.0f, 0.7f);
+        mEnterBgAnimator.setDuration(BG_ANIMATION_DURATION);
+        mEnterBgAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+                //处理一下背景，有点透明度
+                updateBgAlpha(value);
+            }
+        });
+        //退出的
+        mOutBgAnimator = ValueAnimator.ofFloat(0.7f, 1.0f);
+        mOutBgAnimator.setDuration(BG_ANIMATION_DURATION);
+        mOutBgAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+                updateBgAlpha(value);
+            }
+        });
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //释放资源
+        if (mPlayerPresenter != null) {
+            mPlayerPresenter.unRegisterViewCallback(this);
+            mPlayerPresenter = null;
         }
-        mTrackPageView = this.findViewById(R.id.track_pager_view);
-        //创建适配器
-        mTrackPagerAdapter = new PlayerTrackPagerAdapter();
-        //设置适配器
-        mTrackPageView.setAdapter(mTrackPagerAdapter);
-        //切换播放模式的按钮
-        mPlayModeSwitchBtn = this.findViewById(R.id.player_mode_switch_btn);
-        //播放列表
-        mPlayListBtn = this.findViewById(R.id.player_list);
-//        mSobPopWindow = new SobPopWindow();
     }
     /**
      * 给控件设置相关的事件
@@ -205,45 +215,47 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
             @Override
             public void onClick(View v) {
                 //展示播放列表
+
                 mSobPopWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0);
                 //修改背景的透明有一个渐变的过程
                 mEnterBgAnimator.start();
+
             }
         });
-//        mSobPopWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-//            @Override
-//            public void onDismiss() {
-//                //pop窗体消失以后，恢复透明度
-//                mOutBgAnimator.start();
-//            }
-//        });
-//
-//        mSobPopWindow.setPlayListItemClickListener(new SobPopWindow.PlayListItemClickListener() {
-//            @Override
-//            public void onItemClick(int position) {
-//                //播放列表里的item被点击了。
-//                if (mPlayerPresenter != null) {
-//                    mPlayerPresenter.playByIndex(position);
-//                }
-//            }
-//        });
-//
-//        mSobPopWindow.setPlayListActionListener(new SobPopWindow.PlayListActionListener() {
-//            @Override
-//            public void onPlayModeClick() {
-//                //切换播放模式
-//                switchPlayMode();
-//            }
-//
-//            @Override
-//            public void onOrderClick() {
-//                //点击了切换顺序和逆序
-//                //Toast.makeText(PlayerActivity.this, "切换列表书序", Toast.LENGTH_SHORT).show();
-//                if (mPlayerPresenter != null) {
-//                    mPlayerPresenter.reversePlayList();
-//                }
-//            }
-//        });
+        mSobPopWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                //pop窗体消失以后，恢复透明度
+                mOutBgAnimator.start();
+            }
+        });
+
+        mSobPopWindow.setPlayListItemClickListener(new SobPopWindow.PlayListItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                //播放列表里的item被点击了。
+                if (mPlayerPresenter != null) {
+                    mPlayerPresenter.playByIndex(position);
+                }
+            }
+        });
+
+        mSobPopWindow.setPlayListActionListener(new SobPopWindow.PlayListActionListener() {
+            @Override
+            public void onPlayModeClick() {
+                //切换播放模式
+                switchPlayMode();
+            }
+
+            @Override
+            public void onOrderClick() {
+                //点击了切换顺序和逆序
+                //Toast.makeText(PlayerActivity.this, "切换列表书序", Toast.LENGTH_SHORT).show();
+                if (mPlayerPresenter != null) {
+                    mPlayerPresenter.reversePlayList();
+                }
+            }
+        });
     }
     private void switchPlayMode() {
         //根据当前的mode获取到下一个mode
@@ -253,15 +265,66 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
             mPlayerPresenter.switchPlayMode(playMode);
         }
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //释放资源
-        if (mPlayerPresenter != null) {
-            mPlayerPresenter.unRegisterViewCallback(this);
-            mPlayerPresenter = null;
-        }
+    public void updateBgAlpha(float alpha) {
+        Window window = getWindow();
+        WindowManager.LayoutParams attributes = window.getAttributes();
+        attributes.alpha = alpha;
+        window.setAttributes(attributes);
     }
+    /**
+     * 根据当前的状态，更新播放模式图标
+     * PLAY_MODEL_LIST
+     * PLAY_MODEL_LIST_LOOP
+     * PLAY_MODEL_RANDOM
+     * PLAY_MODEL_SINGLE_LOOP
+     */
+    private void updatePlayModeBtnImg() {
+        int resId = R.drawable.selector_play_mode_list_revers;
+        switch (mCurrentMode) {
+            case PLAY_MODEL_LIST:
+                resId = R.drawable.selector_play_mode_list_revers;
+                break;
+            case PLAY_MODEL_RANDOM:
+                resId = R.drawable.selector_paly_mode_random;
+                break;
+            case PLAY_MODEL_LIST_LOOP:
+                resId = R.drawable.selector_paly_mode_list_order_looper;
+                break;
+            case PLAY_MODEL_SINGLE_LOOP:
+                resId = R.drawable.selector_paly_mode_single_loop;
+                break;
+        }
+        mPlayModeSwitchBtn.setImageResource(resId);
+    }
+    /**
+     * 找到各个控件
+     */
+    private void initView() {
+        mControlBtn = this.findViewById(R.id.play_or_pause_btn);
+        mTotalDuration = this.findViewById(R.id.track_duration);
+        mCurrentPosition = this.findViewById(R.id.current_position);
+        mDurationBar = this.findViewById(R.id.track_seek_bar);
+        mPlayNextBtn = this.findViewById(R.id.play_next);
+        mPlayPreBtn = this.findViewById(R.id.play_pre);
+        mTrackTitleTv = this.findViewById(R.id.track_title);
+        if (!TextUtils.isEmpty(mTrackTitleText)) {
+            mTrackTitleTv.setText(mTrackTitleText);
+        }
+        mTrackPageView = this.findViewById(R.id.track_pager_view);
+        //创建适配器
+        mTrackPagerAdapter = new PlayerTrackPagerAdapter();
+        //设置适配器
+        mTrackPageView.setAdapter(mTrackPagerAdapter);
+        //切换播放模式的按钮
+        mPlayModeSwitchBtn = this.findViewById(R.id.player_mode_switch_btn);
+        //播放列表
+        mPlayListBtn = this.findViewById(R.id.player_list);
+        mSobPopWindow = new SobPopWindow();
+    }
+
+
+
+
 
     @Override
     public void onPlayStart() {
@@ -308,9 +371,9 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
             mTrackPagerAdapter.setData(list);
         }
         //数据回来以后，也要给节目列表一份。
-//        if (mSobPopWindow != null) {
-//            mSobPopWindow.setListData(list);
-//        }
+        if (mSobPopWindow != null) {
+            mSobPopWindow.setListData(list);
+        }
     }
 
     @Override
@@ -318,7 +381,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         //更新播放模式,并且修改UI.
         mCurrentMode = playMode;
         //更新pop里的播放模式
-       // mSobPopWindow.updatePlayMode(mCurrentMode);
+        mSobPopWindow.updatePlayMode(mCurrentMode);
         updatePlayModeBtnImg();
     }
 
@@ -378,19 +441,19 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         }
 
         //修改播放里里的播放位置
-//        if (mSobPopWindow != null) {
-//            mSobPopWindow.setCurrentPlayPosition(playIndex);
-//        }
+        if (mSobPopWindow != null) {
+            mSobPopWindow.setCurrentPlayPosition(playIndex);
+        }
     }
 
     @Override
     public void updateListOrder(boolean isReverse) {
-
+        mSobPopWindow.updateOrderIcon(isReverse);
     }
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+        LogUtil.d(TAG, "onPageScrolled: " + "position = " + position);
     }
 
     @Override
@@ -408,29 +471,5 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
 
     }
 
-    /**
-     * 根据当前的状态，更新播放模式图标
-     * PLAY_MODEL_LIST
-     * PLAY_MODEL_LIST_LOOP
-     * PLAY_MODEL_RANDOM
-     * PLAY_MODEL_SINGLE_LOOP
-     */
-    private void updatePlayModeBtnImg() {
-        int resId = R.drawable.selector_play_mode_list_revers;
-        switch (mCurrentMode) {
-            case PLAY_MODEL_LIST:
-                resId = R.drawable.selector_play_mode_list_revers;
-                break;
-            case PLAY_MODEL_RANDOM:
-                resId = R.drawable.selector_paly_mode_random;
-                break;
-            case PLAY_MODEL_LIST_LOOP:
-                resId = R.drawable.selector_paly_mode_list_order_looper;
-                break;
-            case PLAY_MODEL_SINGLE_LOOP:
-                resId = R.drawable.selector_paly_mode_single_loop;
-                break;
-        }
-        mPlayModeSwitchBtn.setImageResource(resId);
-    }
+
 }

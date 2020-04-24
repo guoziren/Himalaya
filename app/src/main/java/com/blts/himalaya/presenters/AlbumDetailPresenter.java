@@ -59,7 +59,7 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
         //去加载更多内容
         mCurrentPageIndex++;
         //传入true，表示结果会追加到列表的后方。
-//        doLoaded(true);
+        doLoaded(true);
     }
 
     private void doLoaded(final boolean isLoaderMore) {

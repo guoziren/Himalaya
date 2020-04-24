@@ -30,7 +30,10 @@ public class PlayerTrackPagerAdapter extends PagerAdapter {
         //设置图片
         Track track = mData.get(position);
         String coverUrlLarge = track.getCoverUrlLarge();
-        Picasso.get().load(coverUrlLarge).into(item);
+        if (coverUrlLarge != null && coverUrlLarge.length() > 0 ){
+
+            Picasso.get().load(coverUrlLarge).into(item);
+        }
         return itemView;
     }
 

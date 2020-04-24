@@ -2,6 +2,7 @@ package com.blts.himalaya.views;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.constraint.Group;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.blts.himalaya.R;
+import com.blts.himalaya.adapters.PlayListAdapter;
 import com.blts.himalaya.base.BaseApplication;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
@@ -26,9 +28,9 @@ public class SobPopWindow extends PopupWindow {
     private PlayListAdapter mPlayListAdapter;
     private TextView mPlayModeTv;
     private ImageView mPlayModeIv;
-    private View mPlayModeContainer;
+    private Group mPlayModeContainer;
     private PlayListActionListener mPlayModeClickListener = null;
-    private View mOrderBtnContainer;
+    private Group mOrderBtnContainer;
     private ImageView mOrderIcon;
     private TextView mOrderText;
 
@@ -65,6 +67,7 @@ public class SobPopWindow extends PopupWindow {
         mPlayModeTv = mPopView.findViewById(R.id.play_list_play_mode_tv);
         mPlayModeIv = mPopView.findViewById(R.id.play_list_play_mode_iv);
         mPlayModeContainer = mPopView.findViewById(R.id.play_list_play_mode_container);
+
         //
         mOrderBtnContainer = mPopView.findViewById(R.id.play_list_order_container);
         mOrderIcon = mPopView.findViewById(R.id.play_list_order_iv);
@@ -79,26 +82,51 @@ public class SobPopWindow extends PopupWindow {
                 SobPopWindow.this.dismiss();
             }
         });
+        int[] ids = mPlayModeContainer.getReferencedIds();
+        for (int id : ids) {
+            mPopView.findViewById(id).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //切换播放模式
+                    if (mPlayModeClickListener != null) {
+                        mPlayModeClickListener.onPlayModeClick();
 
-        mPlayModeContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //切换播放模式
-                if (mPlayModeClickListener != null) {
-                    mPlayModeClickListener.onPlayModeClick();
+                    }
                 }
-            }
-        });
+            });
+        }
+//        mPlayModeContainer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //切换播放模式
+//                if (mPlayModeClickListener != null) {
+//                    mPlayModeClickListener.onPlayModeClick();
+//                }
+//            }
+//        });
+        int[] ids2 = mOrderBtnContainer.getReferencedIds();
+        for (int id : ids2) {
+            mPopView.findViewById(id).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //切换播放列表为顺序或者逆序
+                    mPlayModeClickListener.onOrderClick();
+                }
+            });
+        }
+//        mOrderBtnContainer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //切换播放列表为顺序或者逆序
+//                mPlayModeClickListener.onOrderClick();
+//            }
+//        });
 
-        mOrderBtnContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //切换播放列表为顺序或者逆序
-                mPlayModeClickListener.onOrderClick();
-            }
-        });
+
     }
-
+    public void notifydata(){
+        mPlayListAdapter.notifyDataSetChanged();
+    }
     /**
      * 给适配器设置数据
      *
@@ -112,8 +140,8 @@ public class SobPopWindow extends PopupWindow {
 
     public void setCurrentPlayPosition(int position) {
         if (mPlayListAdapter != null) {
-            mPlayListAdapter.setCurrentPlayPosition(position);
             mTracksList.scrollToPosition(position);
+            mPlayListAdapter.setCurrentPlayPosition(position);
         }
     }
 

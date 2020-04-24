@@ -61,7 +61,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_album_title" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/detail_sub_btn"
         android:layout_width="75dp"
         android:layout_height="30dp"
         android:background="@drawable/shape_subscription_bg"
@@ -81,7 +81,7 @@
         app:layout_constraintTop_toBottomOf="@+id/view2" />
 
     <ImageView
-        android:id="@+id/imageView7"
+        android:id="@+id/detail_play_control"
         android:layout_width="19dp"
         android:layout_height="19dp"
         android:layout_marginStart="10dp"
@@ -91,14 +91,14 @@
         android:src="@mipmap/play_black_normal" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/play_control_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="继续播放"
         android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="@+id/view3"
-        app:layout_constraintStart_toEndOf="@+id/imageView7"
+        app:layout_constraintStart_toEndOf="@+id/detail_play_control"
         app:layout_constraintTop_toTopOf="@+id/view3" />
 
     <ImageButton
